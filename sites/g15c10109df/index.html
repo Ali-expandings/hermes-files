@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset=utf-8><title>Flabby Bird 3D</title>
+<meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#0b0b16;touch-action:none}</style></head>
+<body><canvas id=c></canvas><script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function R(){cv.width=innerWidth;cv.height=innerHeight}R();onresize=R;
+let y,v,pipes,t,score,dead;
+function reset(){y=cv.height/2;v=0;pipes=[];t=0;score=0;dead=false}
+reset();
+function flap(){if(dead)return reset();v=-8}
+onpointerdown=flap;onkeydown=e=>{if(e.code=='Space')flap()};
+setInterval(()=>{
+ x.fillStyle='#0b0b16';x.fillRect(0,0,cv.width,cv.height);
+ if(dead){x.fillStyle='#fff';x.font='bold 28px system-ui';x.textAlign='center';
+  x.fillText('Tap to restart',cv.width/2,cv.height/2);
+  x.font='20px system-ui';x.fillText('Score: '+score,cv.width/2,cv.height/2+40);return}
+ v+=0.5;y+=v;
+ if(t++%95==0)pipes.push({x:cv.width,gap:110+Math.random()*(cv.height-320),scored:false});
+ x.fillStyle='#2dd4a7';
+ for(const p of pipes){p.x-=3.2;
+  x.fillRect(p.x,0,60,p.gap);x.fillRect(p.x,p.gap+170,60,cv.height);
+  if(p.x<130&&p.x+60>70&&(y-16<p.gap||y+16>p.gap+170))dead=true;
+  if(!p.scored&&p.x+60<70){p.scored=true;score++}}
+ pipes=pipes.filter(p=>p.x>-70);
+ x.fillStyle='#ffd23f';x.beginPath();x.arc(100,y,16,0,7);x.fill();
+ x.fillStyle='#000';x.beginPath();x.arc(106,y-4,3,0,7);x.fill();
+ if(y>cv.height||y<0)dead=true;
+ x.fillStyle='#fff';x.font='bold 24px system-ui';x.textAlign='left';x.fillText(score,20,40);
+},1000/60);
+</script></body></html>
